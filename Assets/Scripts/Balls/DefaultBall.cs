@@ -16,13 +16,13 @@ public class DefaultBall : BaseBall
         ctx.Rb.mass = _stats.Weight;
         ctx.LifeSeconds = _stats.LifeSeconds;
         ctx.Rb.useGravity = true;
-        ctx.Rb.isKinematic = false;
     }
 
     public override void OnStop(BallContext ctx)
     {
         ctx.Rb.useGravity = false;
-        ctx.Rb.isKinematic = true;
+        ctx.Rb.linearVelocity = Vector3.zero;
+        ctx.Rb.angularVelocity = Vector3.zero;
         return;
     }
 
