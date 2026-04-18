@@ -9,12 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adfd8b62b89fecc4a9a9999bad3d2f64, type: 3}
-  m_Name: DefaultBallStats
+  m_Script: {fileID: 11500000, guid: 5cc918864aa1bcb428f152969f4a6b91, type: 3}
+  m_Name: DefaultBrick
   m_EditorClassIdentifier: 
-  Name: Test
-  LifeSeconds: 4
-  Weight: 10
-  StartSpeed: 5
-  Damage: 1
-  InicialImpulse: 50
+  MaxHealth: 1
+  SlowAmount: 0

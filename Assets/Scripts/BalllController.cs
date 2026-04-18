@@ -6,6 +6,7 @@ public class BalllController : MonoBehaviour
     [SerializeField] private Rigidbody _rb;
     [SerializeField] private BaseBall _currentBall;
 
+    [SerializeField] private GameObject _ropePoint;
     [SerializeField] private GameObject _cameraHolder;
     [SerializeField] private Transform[] _allCameraPossitions;
     private int _currentViewIndex = 0;
@@ -14,6 +15,9 @@ public class BalllController : MonoBehaviour
     private bool _isActive;
 
     private CountdownTimer _countdownTimer;
+
+    private Plane _currentMovemntPlane;
+    private bool _isDraging;
     private void Start()
     {
         _ctx = new BallContext();
@@ -22,7 +26,10 @@ public class BalllController : MonoBehaviour
         _ctx.TargetPossition = Vector3.zero;
 
         InputManager.Instance.InputActions.Player.Start.performed += OnStart;
-        InputManager.Instance.InputActions.Player.Move.performed += MoveBall;
+        InputManager.Instance.InputActions.Player.Drag.performed += MoveBall;
+        InputManager.Instance.InputActions.Player.LeftClick.performed += OnMouseDownInput;
+        InputManager.Instance.InputActions.Player.LeftClick.canceled += OnMouseUpInput;
+
         InputManager.Instance.InputActions.Player.ChangeView.performed += ChangeView;
 
         _cameraHolder.transform.position = _allCameraPossitions[_currentViewIndex].position;
@@ -47,24 +54,39 @@ public class BalllController : MonoBehaviour
         _currentBall.OnHitEffect(_ctx, collision);
     }
     private void OnStart(InputAction.CallbackContext context)
-    {
+    {  
         _currentBall.OnStart(_ctx);
         _countdownTimer.SetInitialTime(_ctx.LifeSeconds);
         _countdownTimer.Restart();
     }
     private void Finish()
     {
+
         _currentBall.OnStop(_ctx);
+    }
+    private void OnMouseDownInput(InputAction.CallbackContext context)
+    {
+        _currentMovemntPlane = new Plane(Camera.main.transform.forward, _rb.position);
+        _isDraging = true;
+    }
+    private void OnMouseUpInput(InputAction.CallbackContext context)
+    {
+        _isDraging = false;
     }
     private void MoveBall(InputAction.CallbackContext context)
     {
-        if (_isActive == false) return;
+        if( _isDraging == false) return;
 
-        Vector3 forwordVel = _cameraHolder.transform.forward * context.ReadValue<Vector2>().y;
-        Vector3 rightVel = _cameraHolder.transform.right * context.ReadValue<Vector2>().x;
+        Ray ray = Camera.main.ScreenPointToRay(context.ReadValue<Vector2>());
 
-        Vector3 FinalVel = forwordVel + rightVel;
-        _ctx.Transform.position += FinalVel;
+        if(_currentMovemntPlane.Raycast(ray, out float enter))
+        {
+            if (Vector3.Distance(ray.GetPoint(enter), _ropePoint.transform.position) < 5f)
+            {
+                _rb.MovePosition(ray.GetPoint(enter));
+                _rb.transform.LookAt(_ropePoint.transform.position);
+            }
+        }
     }
     private void ChangeView(InputAction.CallbackContext context)
     {

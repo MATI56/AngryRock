@@ -8,7 +8,10 @@ public class DefaultBall : BaseBall
 
     public override void OnHitEffect(BallContext ctx, Collision collision)
     {
-       return;
+        if (collision.gameObject.TryGetComponent<IBrick>(out IBrick brick))
+        {
+            brick.TakeDamage(_stats.Damage);
+        }
     }
 
     public override void OnStart(BallContext ctx)
@@ -16,13 +19,14 @@ public class DefaultBall : BaseBall
         ctx.Rb.mass = _stats.Weight;
         ctx.LifeSeconds = _stats.LifeSeconds;
         ctx.Rb.useGravity = true;
+        ctx.Rb.isKinematic = false;
+        ctx.Rb.AddForce(-ctx.Rb.transform.up * _stats.InicialImpulse, ForceMode.Impulse);
     }
 
     public override void OnStop(BallContext ctx)
     {
         ctx.Rb.useGravity = false;
-        ctx.Rb.linearVelocity = Vector3.zero;
-        ctx.Rb.angularVelocity = Vector3.zero;
+        ctx.Rb.isKinematic = true;
         return;
     }
 
