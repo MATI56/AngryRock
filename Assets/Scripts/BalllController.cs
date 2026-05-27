@@ -9,6 +9,7 @@ public class BalllController : MonoBehaviour
     [SerializeField] private GameObject _ropePoint;
     [SerializeField] private GameObject _cameraHolder;
     [SerializeField] private Transform[] _allCameraPossitions;
+    [SerializeField] private float _rotationSpeed = 4f;
     private int _currentViewIndex = 0;
 
     private BallContext _ctx;
@@ -18,6 +19,8 @@ public class BalllController : MonoBehaviour
 
     private Plane _currentMovemntPlane;
     private bool _isDraging;
+
+    private Quaternion targetRot;
     private void Start()
     {
         _ctx = new BallContext();
@@ -39,6 +42,7 @@ public class BalllController : MonoBehaviour
 
         _countdownTimer = new CountdownTimer(_ctx.LifeSeconds);
         _countdownTimer.OnTimerStop += Finish;
+        Finish();
     }
     public void Update()
     {
@@ -46,6 +50,11 @@ public class BalllController : MonoBehaviour
 
         _countdownTimer.Tick(Time.deltaTime);
         _currentBall.OnUpdate(_ctx);
+
+        if (_isDraging)
+        {
+            _rb.MoveRotation(Quaternion.RotateTowards(_rb.rotation, targetRot, _rotationSpeed));
+        }
     }
     private void OnCollisionEnter(Collision collision)
     {
@@ -75,19 +84,20 @@ public class BalllController : MonoBehaviour
     }
     private void MoveBall(InputAction.CallbackContext context)
     {
-        if( _isDraging == false) return;
+        if (_isDraging == false) return;
 
         Ray ray = Camera.main.ScreenPointToRay(context.ReadValue<Vector2>());
 
-        if(_currentMovemntPlane.Raycast(ray, out float enter))
+        if (_currentMovemntPlane.Raycast(ray, out float enter))
         {
             if (Vector3.Distance(ray.GetPoint(enter), _ropePoint.transform.position) < 5f)
             {
                 _rb.MovePosition(ray.GetPoint(enter));
-                _rb.transform.LookAt(_ropePoint.transform.position);
+                targetRot = Quaternion.LookRotation(_ropePoint.transform.position - _rb.position);
             }
         }
     }
+
     private void ChangeView(InputAction.CallbackContext context)
     {
         if (!_isActive) return;
