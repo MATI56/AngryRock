@@ -3,24 +3,39 @@ using UnityEngine.InputSystem;
 
 public class BalllController : MonoBehaviour
 {
+    public static BalllController Instance;
+
+    public bool IsActive;
     [SerializeField] private Rigidbody _rb;
     [SerializeField] private BaseBall _currentBall;
 
     [SerializeField] private GameObject _ropePoint;
     [SerializeField] private GameObject _cameraHolder;
     [SerializeField] private Transform[] _allCameraPossitions;
+    [SerializeField] private float _movementSpeed = 4f;
     [SerializeField] private float _rotationSpeed = 4f;
+
+    [SerializeField] private float _maxZPositon;
+    [SerializeField] private SphereCollider _boundries;
     private int _currentViewIndex = 0;
 
     private BallContext _ctx;
-    private bool _isActive;
 
     private CountdownTimer _countdownTimer;
 
     private Plane _currentMovemntPlane;
     private bool _isDraging;
 
-    private Quaternion targetRot;
+    private Vector3 _targerPosition;
+    private Quaternion targetRotation;
+
+    private void Awake()
+    {
+        if(Instance == null)
+            Instance = this;
+        else
+            Destroy(this);
+    }
     private void Start()
     {
         _ctx = new BallContext();
@@ -38,7 +53,7 @@ public class BalllController : MonoBehaviour
         _cameraHolder.transform.position = _allCameraPossitions[_currentViewIndex].position;
         _cameraHolder.transform.rotation = _allCameraPossitions[_currentViewIndex].rotation;
 
-        _isActive = true;
+        IsActive = true;
 
         _countdownTimer = new CountdownTimer(_ctx.LifeSeconds);
         _countdownTimer.OnTimerStop += Finish;
@@ -46,31 +61,33 @@ public class BalllController : MonoBehaviour
     }
     public void Update()
     {
-        if (_isActive == false) return;
+        if (IsActive == false) return;
 
         _countdownTimer.Tick(Time.deltaTime);
         _currentBall.OnUpdate(_ctx);
 
         if (_isDraging)
         {
-            _rb.MoveRotation(Quaternion.RotateTowards(_rb.rotation, targetRot, _rotationSpeed));
+            _rb.MovePosition(Vector3.MoveTowards(_rb.position, _targerPosition, _movementSpeed));
+            _rb.MoveRotation(Quaternion.RotateTowards(_rb.rotation, targetRotation, _rotationSpeed).normalized);
         }
     }
     private void OnCollisionEnter(Collision collision)
     {
-        if (_isActive == false) return;
+        if (IsActive == false) return;
 
         _currentBall.OnHitEffect(_ctx, collision);
     }
     private void OnStart(InputAction.CallbackContext context)
-    {  
+    {
+        if (_currentBall.IsActive) return;
+
         _currentBall.OnStart(_ctx);
         _countdownTimer.SetInitialTime(_ctx.LifeSeconds);
         _countdownTimer.Restart();
     }
     private void Finish()
     {
-
         _currentBall.OnStop(_ctx);
     }
     private void OnMouseDownInput(InputAction.CallbackContext context)
@@ -92,15 +109,24 @@ public class BalllController : MonoBehaviour
         {
             if (Vector3.Distance(ray.GetPoint(enter), _ropePoint.transform.position) < 5f)
             {
-                _rb.MovePosition(ray.GetPoint(enter));
-                targetRot = Quaternion.LookRotation(_ropePoint.transform.position - _rb.position);
+                _targerPosition = ray.GetPoint(enter);
+                if(Vector3.Distance(_targerPosition, _ropePoint.transform.position) >= _boundries.radius)
+                {
+                    _targerPosition = _boundries.ClosestPoint(_targerPosition);
+                }
+                if(_targerPosition.z >= _maxZPositon)
+                {
+                    _targerPosition.z = _maxZPositon;
+                }
+
+                targetRotation = Quaternion.LookRotation(_ropePoint.transform.position - _rb.position);
             }
         }
     }
 
     private void ChangeView(InputAction.CallbackContext context)
     {
-        if (!_isActive) return;
+        if (!IsActive) return;
 
         _currentViewIndex = _currentViewIndex >= _allCameraPossitions.Length - 1 ? 0 : _currentViewIndex + 1;
         

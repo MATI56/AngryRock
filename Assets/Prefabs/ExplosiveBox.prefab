@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4902433362856133145}
   - component: {fileID: 6296264264482700241}
   - component: {fileID: 6014585185442630048}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ExplosiveBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
