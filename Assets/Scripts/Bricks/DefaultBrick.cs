@@ -7,6 +7,7 @@ public class DefaultBrick : BaseBrick
     private float _currentHealth;
     public override void OnDeath()
     {
+        ShopManager.Instance.AddCoins(_brickStats.CoinValue);
         Instantiate(_destroyBrick, transform.position, transform.rotation);
         Destroy(gameObject);
     }

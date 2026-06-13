@@ -1,4 +1,3 @@
-
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,16 +14,8 @@ public class ShopItem : MonoBehaviour
         _costText.SetText(_ballToBuy.GetCost().ToString());
         _image.sprite = _ballToBuy.GetSprite();
     }
-    public bool BuyBall()
+    public void BuyBall()
     {
-        if (ShopManager.Instance.CurrentCoins >= _ballToBuy.GetCost())
-        {
-            ShopManager.Instance.CurrentCoins -= _ballToBuy.GetCost();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        BalllController.Instance.ChangeBallType(_ballToBuy);
     }
 }

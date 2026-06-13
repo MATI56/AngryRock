@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: adfd8b62b89fecc4a9a9999bad3d2f64, type: 3}
-  m_Name: DefaultBallStats
+  m_Name: HeavyBallStats
   m_EditorClassIdentifier: 
-  Name: Test
-  LifeSeconds: 4
-  Weight: 10
+  Name: Heavy
+  LifeSeconds: 7
+  Weight: 50
   StartSpeed: 5
-  Damage: 1
-  InicialImpulse: 50
-  Material: {fileID: 2100000, guid: 7dd2dd8500e5f574494da9b2d6337ba9, type: 2}
-  Scale: {x: 1, y: 1, z: 1}
+  Damage: 5
+  InicialImpulse: 100
+  Material: {fileID: 2100000, guid: 196c72a46f69c874e9b0f1415694d68b, type: 2}
+  Scale: {x: 1.3, y: 1.3, z: 1.3}

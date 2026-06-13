@@ -19,7 +19,6 @@ public class DefaultBall : BaseBall
 
     public override void OnStart(BallContext ctx)
     {
-        base.OnStart(ctx);
         ctx.Rb.mass = _stats.Weight;
         ctx.LifeSeconds = _stats.LifeSeconds;
         ctx.Rb.useGravity = true;
@@ -29,7 +28,6 @@ public class DefaultBall : BaseBall
 
     public override void OnStop(BallContext ctx)
     {
-        base.OnStop(ctx);
         ctx.Rb.useGravity = false;
         ctx.Rb.isKinematic = true;
         return;
@@ -50,9 +48,12 @@ public class DefaultBall : BaseBall
         return Cost;
     }
 
-
     public override Sprite GetSprite()
     {
         return Sprite;
+    }
+    public override BallStats GetStats()
+    {
+        return _stats;
     }
 }

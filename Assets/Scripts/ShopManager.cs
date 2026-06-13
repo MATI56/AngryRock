@@ -21,6 +21,7 @@ public class ShopManager : MonoBehaviour
     void Start()
     {
         InputManager.Instance.InputActions.Player.Shop.performed += OpenShop;
+        _coinsText.SetText(CurrentCoins.ToString() + "G");
     }
 
     public void OpenShop(InputAction.CallbackContext context)
@@ -38,5 +39,19 @@ public class ShopManager : MonoBehaviour
         InputManager.Instance.InputActions.Player.Shop.performed -= CloseShop;
     }
 
-
+    public void AddCoins(int amount)
+    {
+        CurrentCoins += amount;
+        _coinsText.SetText(CurrentCoins.ToString() + "G");
+    }
+    public bool RemoveCoins(int amount)
+    {
+        if (CurrentCoins >= amount)
+        {
+            CurrentCoins -= amount;
+            _coinsText.SetText(CurrentCoins.ToString() + "G");
+            return true;
+        }
+        return false;
+    }
 }

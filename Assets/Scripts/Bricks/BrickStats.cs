@@ -5,4 +5,5 @@ public class BrickStats : ScriptableObject
 {
     public float MaxHealth;
     public float SlowAmount;
+    public int CoinValue;
 }

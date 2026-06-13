@@ -7,6 +7,7 @@ public class BalllController : MonoBehaviour
 
     public bool IsActive;
     [SerializeField] private Rigidbody _rb;
+    [SerializeField] private MeshRenderer _meshRenderer;
     [SerializeField] private BaseBall _currentBall;
 
     [SerializeField] private GameObject _ropePoint;
@@ -28,6 +29,8 @@ public class BalllController : MonoBehaviour
 
     private Vector3 _targerPosition;
     private Quaternion targetRotation;
+
+    private bool isCurrentBallActive = false;
 
     private void Awake()
     {
@@ -72,6 +75,12 @@ public class BalllController : MonoBehaviour
             _rb.MoveRotation(Quaternion.RotateTowards(_rb.rotation, targetRotation, _rotationSpeed).normalized);
         }
     }
+    public void ChangeBallType(BaseBall ballToSwap)
+    {
+        _currentBall = ballToSwap;
+        _meshRenderer.material = _currentBall.GetStats().Material;
+        transform.localScale = _currentBall.GetStats().Scale;
+    }
     private void OnCollisionEnter(Collision collision)
     {
         if (IsActive == false) return;
@@ -80,18 +89,25 @@ public class BalllController : MonoBehaviour
     }
     private void OnStart(InputAction.CallbackContext context)
     {
-        if (_currentBall.IsActive) return;
+        if (isCurrentBallActive) return;
+        if (!ShopManager.Instance.RemoveCoins(_currentBall.GetCost())) return;
 
+        isCurrentBallActive = true;
+        _isDraging = false;
         _currentBall.OnStart(_ctx);
         _countdownTimer.SetInitialTime(_ctx.LifeSeconds);
         _countdownTimer.Restart();
+        
     }
     private void Finish()
     {
+        isCurrentBallActive = false;
         _currentBall.OnStop(_ctx);
     }
     private void OnMouseDownInput(InputAction.CallbackContext context)
     {
+        if (isCurrentBallActive) return;
+
         _currentMovemntPlane = new Plane(Camera.main.transform.forward, _rb.position);
         _isDraging = true;
     }

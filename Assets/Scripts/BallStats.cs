@@ -8,4 +8,6 @@ public abstract class BallStats : ScriptableObject
     public float StartSpeed;
     public float Damage;
     public float InicialImpulse;
+    public Material Material;
+    public Vector3 Scale;
 }
